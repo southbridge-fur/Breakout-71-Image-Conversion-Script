@@ -23,3 +23,31 @@ options:
   -c, --credit CREDIT  The credit to give for the image.
   --hsv HSV            A comma-separated list of coefficients for hue, saturation, and value to use while finding the nearest color values.
 ```
+
+### Example
+
+```bash
+$ python converter.py ../kirby.png --name "Kirby" --hsv "6.0,1.0,0.1"
+
+\`\`\`
+[Kirby]
+__ggg_gggggg_gg_
+_gPWPgPWWWWPgPPg
+gPWWWPWWWWWWPgWg
+gWWWWWWWWWWWWPWg
+gPWWWWWWWgWgWWWg
+_gPWWWWWWgWgWWPg
+_ggPWWWWWgWgWWg_
+_gPWWWPPWWWWWPg_
+_gPWWWWWWWWWWWg_
+__gWWWWWWWgWWPg_
+__gPWWWWWWWWWg__
+_gPgPWWWWWWWPg__
+_gPPggPWWWPPg___
+_gPPPggggggg____
+_gPPg_gPPg______
+__gg___gg_______
+
+[No Credit]
+\`\`\`
+```
