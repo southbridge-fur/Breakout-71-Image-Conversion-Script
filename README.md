@@ -29,7 +29,7 @@ options:
 ```bash
 $ python converter.py ../kirby.png --name "Kirby" --hsv "6.0,1.0,0.1"
 
-\`\`\`
+\```
 [Kirby]
 __ggg_gggggg_gg_
 _gPWPgPWWWWPgPPg
@@ -49,5 +49,5 @@ _gPPg_gPPg______
 __gg___gg_______
 
 [No Credit]
-\`\`\`
+\```
 ```
