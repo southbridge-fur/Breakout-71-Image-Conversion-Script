@@ -1,7 +1,18 @@
-import os
-import sys
+#!/usr/bin/env python
+
+import argparse
 import colorsys
 from PIL import Image, ImageOps
+
+parser = argparse.ArgumentParser(
+    prog = "Breakout 71 image converter",
+    description = "Converts an image to a custom stage string for the game Breakout 71. https://breakout.lecaro.me/",
+    epilog = "Created by Southbridge. Licensed MIT. Available here https://github.com/southbridge-fur/Breakout-71-Image-Conversion-Script/"
+)
+
+parser.add_argument("filename")
+parser.add_argument("-n","--name", help = "The name of the level to display in the level list. Defaults to the filename")
+parser.add_argument("-c","--credit", help = "The credit to give for the image.")
 
 MIN_SIZE = 6
 MAX_SIZE = 21
@@ -10,7 +21,7 @@ TEMPLATE = """
 ```
 [{name}]
 {level}
-[{credits}]
+[{credit}]
 ```
 """
 
@@ -61,17 +72,15 @@ def find_nearest_color(pixel):
                abs(x[0]-hsv_color[0]) * 10 + # We want to prioritize matching hues over saturation and value.
                abs(x[1]-hsv_color[1]) +
                abs(x[2]-hsv_color[2]))
-        
-for infile in sys.argv[1:]:
-    image = Image.open(infile)
-    if image.size[0] > MAX_SIZE \
-       or image.size[0] < MIN_SIZE \
-       or image.size[1] > MAX_SIZE \
-       or image.size[1] < MIN_SIZE:
-        print("Image is the wrong size {0}".format(image.size))
-        continue
 
-    largest_side = max(image.size)
+def convert_image(filename):
+    image = Image.open(filename)
+    if image.size[0] > MAX_SIZE \
+       or image.size[1] > MAX_SIZE:
+        print("Image is too large {0}, must be smaller than {1} pixels on all sides.".format(image.size, MAX_SIZE))
+        return ""
+
+    largest_side = max(list(image.size) + [MIN_SIZE])
     padded_image = ImageOps.pad(image, (largest_side, largest_side), color=(0,0,0,0))
 
     image_string = ""
@@ -84,10 +93,28 @@ for infile in sys.argv[1:]:
                 continue
             nearest = find_nearest_color(pixel)
             if nearest is None:
-                image_string += "w" 
+                image_string += "_" 
                 continue
             image_string += HSV_COLORS[nearest]
         image_string += "\n"
-    print(TEMPLATE.format(name = infile, level = image_string, credits="bweh"))
+    return image_string
 
+if __name__ == "__main__":
+    args = parser.parse_args()
+    
+    image_string = convert_image(args.filename)
+
+    name = args.filename
+    if not args.name is None:
+        name = args.name
+
+    credit = "No Credit"
+    if not args.credit is None:
+        credit = args.credit
+        
+    print (TEMPLATE.format(
+        name = name,
+        level = image_string,
+        credit = credit))
+    
               
