@@ -24,12 +24,26 @@ options:
   --hsv HSV            A comma-separated list of coefficients for hue, saturation, and value to use while finding the nearest color values.
 ```
 
+---
+
+To run the script fully from nothing:
+
+```bash
+$ git clone https://github.com/southbridge-fur/Breakout-71-Image-Conversion-Script.git b71
+$ cd b71
+$ python -m venv venv
+$ source venv/bin/activate
+$ python -m pip install -r requirements.txt
+$ python convert.py 
+```
+
 ### Example
 
 ```bash
 $ python converter.py ../kirby.png --name "Kirby" --hsv "6.0,1.0,0.1"
+```
 
-\```
+```
 [Kirby]
 __ggg_gggggg_gg_
 _gPWPgPWWWWPgPPg
@@ -49,5 +63,4 @@ _gPPg_gPPg______
 __gg___gg_______
 
 [No Credit]
-\```
 ```
