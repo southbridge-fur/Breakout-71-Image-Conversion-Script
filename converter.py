@@ -2,7 +2,10 @@
 
 import argparse
 import colorsys
+from colored import Fore, Back, Style, set_tty_aware
 from PIL import Image, ImageOps
+
+set_tty_aware()
 
 parser = argparse.ArgumentParser(
     prog = "Breakout 71 image converter",
@@ -13,6 +16,7 @@ parser = argparse.ArgumentParser(
 parser.add_argument("filename")
 parser.add_argument("-n","--name", help = "The name of the level to display in the level list. Defaults to the filename")
 parser.add_argument("-c","--credit", help = "The credit to give for the image.")
+parser.add_argument("--hsv", help="A comma-separated list of coefficients for hue, saturation, and value to use while finding the nearest color values.", type=str, default = "10.0,1.0,1.0")
 
 MIN_SIZE = 6
 MAX_SIZE = 21
@@ -54,26 +58,29 @@ def rgb_string_to_tuple(color_str):
     if color_str.startswith("#"):
         color_str = color_str[1:]
     return tuple([
-        int(color_str[0:1], 16),
-        int(color_str[2:3], 16),
-        int(color_str[4:5], 16)
+        int(color_str[0:2], 16),
+        int(color_str[2:4], 16),
+        int(color_str[4:6], 16)
     ])
+
+
+COLOR_CODES = { key : Back.rgb(*rgb_string_to_tuple(key)) + Fore.white + value + Style.reset for key, value in COLOR_CODES.items() }
 
 HSV_COLORS = {
     colorsys.rgb_to_hsv(*rgb_string_to_tuple(key)) : item
     for key,item in COLOR_CODES.items()
 }
 
-def find_nearest_color(pixel):
+def find_nearest_color(pixel, hsv = (1.0, 1.0, 1.0)):
     if pixel is None:
         return None;
     hsv_color = colorsys.rgb_to_hsv(pixel[0], pixel[1], pixel[2])
     return min(HSV_COLORS.keys(), key=lambda x:
-               abs(x[0]-hsv_color[0]) * 10 + # We want to prioritize matching hues over saturation and value.
-               abs(x[1]-hsv_color[1]) +
-               abs(x[2]-hsv_color[2]))
+               abs(x[0]-hsv_color[0]) * float(hsv[0]) +
+               abs(x[1]-hsv_color[1]) * float(hsv[1]) +
+               abs(x[2]-hsv_color[2]) * float(hsv[2]))
 
-def convert_image(filename):
+def convert_image(filename, hsv):
     image = Image.open(filename)
     if image.size[0] > MAX_SIZE \
        or image.size[1] > MAX_SIZE:
@@ -91,7 +98,7 @@ def convert_image(filename):
             if pixel[3] < 128: #alpha
                 image_string += "_" 
                 continue
-            nearest = find_nearest_color(pixel)
+            nearest = find_nearest_color(pixel, hsv)
             if nearest is None:
                 image_string += "_" 
                 continue
@@ -102,7 +109,7 @@ def convert_image(filename):
 if __name__ == "__main__":
     args = parser.parse_args()
     
-    image_string = convert_image(args.filename)
+    image_string = convert_image(args.filename, args.hsv.split(","))
 
     name = args.filename
     if not args.name is None:
